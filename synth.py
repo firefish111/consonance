@@ -15,14 +15,14 @@ def normalise(freqs, t, total):
 
 # generator
 def synth(secs, amplitude, *args, **kwargs):
-  print(args, len(args), kwargs)
+  # if we want to interpolate it into another tone
   if "interpolate_with" in kwargs:
-    mid = len(args) // 2
+    # zip: so we end up with tuples of (start, end), like so => (a_1, b_1), (a_2, b_2), (a_3, b_3), etc
     data = list(zip(args, kwargs["interpolate_with"]))
-    print(data, kwargs)
 
   for sample in range(round(secs * SAMPLE_RATE)): # tick for that many samples
-    # theta: progresses by 2pi every second
+    # t: progresses by 1 every second
+    # theta: progresses by 2pi every second, as that ensures that a base sin wave has frequency of 1
     t = sample / SAMPLE_RATE
     theta = t * 2 * math.pi
     if "interpolate_with" in kwargs:
@@ -31,7 +31,12 @@ def synth(secs, amplitude, *args, **kwargs):
       wave = sum(math.sin(theta * freq) for freq in args) * amplitude
     clamped = max(-1, min(wave, 1))
 
-    yield math.floor((clamped + 1) * 127.5) # map it onto 0-255
+    yield min(255, math.floor((clamped + 1) * 128)) # map it onto 0-255
+
+# pause: i.e. all samples are set to 0
+def pause(secs):
+  for sample in range(round(secs * SAMPLE_RATE)): # tick for that many samples
+    yield 128 # zero
 
 # takes list of generators
 def write(name, *args):
