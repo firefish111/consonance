@@ -15,7 +15,7 @@ def normalise(freqs, t, total):
   return n
 
 # generator
-def synth(secs, amplitude, *tones, interpolate_with=None):
+def synth(secs, *tones, volume_profile=(lambda progress: 1), interpolate_with=None):
   # if we want to interpolate it into another tone
   if interpolate_with is not None:
     # zip: so we end up with tuples of (start, end), like so => (a_1, b_1), (a_2, b_2), (a_3, b_3), etc
@@ -26,10 +26,13 @@ def synth(secs, amplitude, *tones, interpolate_with=None):
     # theta: progresses by 2pi every second, as that ensures that a base sin wave has frequency of 1
     t = sample / SAMPLE_RATE
     theta = t * 2 * math.pi
+
+    # progress of the way through
+    progress = t / secs
     if interpolate_with is not None:
-      wave = sum(math.sin(normalise(freqs, t, secs)) for freqs in data) * amplitude
+      wave = sum(math.sin(normalise(freqs, t, secs)) for freqs in data) * volume_profile(progress)
     else:
-      wave = sum(math.sin(theta * freq) for freq in tones) * amplitude
+      wave = sum(math.sin(theta * freq) for freq in tones) * volume_profile(progress)
     clamped = max(-1, min(wave, 1))
 
     yield min(255, math.floor((clamped + 1) * 128)) # map it onto 0-255
