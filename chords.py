@@ -5,6 +5,10 @@ import logging
 semitone_step = 2**(1/12)
 base_note = 440 # A4 is chosen as it is integer
 
+# step up note by semitones
+def step_up(freq, by):
+  return freq * (semitone_step)**by
+
 # round a frequency to nearest semitone the semitone
 def round_note(freq):
   # number of semitones we are away from A4
@@ -17,15 +21,18 @@ def round_note(freq):
   return ret
 
 # to make it not sound awful, we take the (f_1, f_2) tuple and convert it to a major cord
-def to_chord(formants):
-  # difference in formants. we use this as our top note in a major scale
-  delta = formants[1] - formants[0]
+def base_to_chord(base):
+  # so apparently sounds less worse when "base" is top note, not root note of chord?
+  root = round_note(base * 4 / 6)
 
-  part = delta / 6
-
-  # 4:5:6
+  # 4:5:6, except made to fit 12-tet
   return (
-    round_note(part * 4),
-    round_note(part * 5),
-    round_note(part * 6)
+    root,
+    step_up(root, 4),
+    step_up(root, 7),
   )
+
+# converts fomants into two major chords, where those formants are the base frequencies of the chords
+def to_chord(formants):
+  # sum here chains tuples together
+  return sum((base_to_chord(form) for form in formants), ())

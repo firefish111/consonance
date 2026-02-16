@@ -33,7 +33,7 @@ tones = sentence_to_tones(
   TIME_PER_SYLLABLE,
   VOLUME,
   texts[TEXT_ID],
-  f_filter=to_chord,
+  formant_filter=to_chord,
   stop_pause=1.5,
   break_pause=0.7,
   interword_pause=0.025,
