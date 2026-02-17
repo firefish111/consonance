@@ -1,5 +1,5 @@
-from phones_list import *
-import parsing
+from .phones_list import *
+from . import parsing
 
 table = parsing.get_table()
 

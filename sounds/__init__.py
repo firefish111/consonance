@@ -1,11 +1,12 @@
-#! /usr/bin/python
-
 import math
 
-# local import
-from chords import to_chord
-from sentence import sentence_to_tones
-import synth
+# local imports.
+# the number of dots signifies the number of levels up (where . is in same directory).
+# whatever is after "import" should be hereafter a valid expression,
+# so "import .myfile" is wrong, but "from . import myfile" is.
+from .chords import to_chord
+from .sentence import sentence_to_tones
+from . import synth
 
 # phonetic pangram
 texts = {

@@ -1,6 +1,7 @@
-import phones_list
-from word import Word
-import synth
+from . import phones_list
+from .word import Word
+from . import synth
+
 import logging
 
 # secs_per syllable = seconds per syllable
