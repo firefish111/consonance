@@ -5,52 +5,73 @@ if (!("WebSocketStream" in self)) {
   debugger;
 }
 
-// WORKING CODE
-const out = document.querySelector("p");
-
 // stub
 async function play_sample(arraybuf) {
-  console.log(`received sample ${arraybuf}`);
-  await new Promise(r => setTimeout(r, arraybuf.length/8));
+  await play_chunk(arraybuf);
+  return new Promise(r =>
+    setTimeout(
+      r,
+      arraybuf.length * 1000 / window.SAMPLE_RATE
+    )
+  );
 }
 
 async function play_ticket(ticket) {
-  console.log(`received ticket ${ticket}`);
-  await new Promise(r => setTimeout(r, ticket.pause_samples/8));
+  console.log(`received ticket ${JSON.stringify(ticket)}`);
+  switch (ticket.type) {
+    case "start":
+      console.log(`start: ${ticket}`);
+      set_button(false);
+      break;
+    case "end":
+      console.log(`end: ${ticket}`);
+      set_button(true);
+      break;
+    case "pause":
+      console.log(`pausing for ${ticket.samples}`);
+      return new Promise(r =>
+        setTimeout(
+          r,
+          ticket.samples * 1000 / window.SAMPLE_RATE
+        )
+      );
+    default:
+      break;
+  }
 }
 
-// we do automatic detection of protocol (ws:// or wss://), we can't know if we have ssl or not
-const wss = new WebSocketStream(
-  location.protocol.replace("http", "ws") + "//" +
-  location.host +
-  "/soundify" // url slug
-);
+let wss = null;
+let reader = null;
+let writer = null;
 
-console.log("Connected to", wss.url);
+async function init_ws() {
+  // we do automatic detection of protocol (ws:// or wss://), we can't know if we have ssl or not
+  wss = new WebSocketStream(
+    location.protocol.replace("http", "ws") + "//" +
+    location.host +
+    "/soundify" // url slug
+  );
 
-async function work() {
+  console.log("Connected to", wss.url);
+
   const { readable, writable, extensions, protocol } = await wss.opened;
 
   console.log("Websocket open");
 
-  const reader = readable.getReader();
-  const writer = writable.getWriter();
+  reader = readable.getReader();
+  writer = writable.getWriter();
+}
 
+async function read_ws() {
   // TODO: write on button press
   writer.write("blah blah blah");
 
   for (;;) {
     const { value, done } = await reader.read();
-    console.log(value, done);
 
     if (typeof value == "string") { // if is a ticket
       const ticket = JSON.parse(value);
-      if (ticket.type == "initial") {
-        // TODO: initial ticket handling
-        console.log(`do something with this idk: ${ticket}`);
-      } else {
-        await play_ticket(JSON.parse(value));
-      }
+      await play_ticket(JSON.parse(value));
     } else { // if is a binary blob, i.e. list of samples
       const floated = new Float32Array(value, 0, value.byteLength >> 2); // this is just a pointer, does not copy
       await play_sample(floated);
@@ -59,5 +80,3 @@ async function work() {
     if (done) break;
   }
 }
-
-work();

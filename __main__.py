@@ -37,7 +37,7 @@ def soundify(ws):
     tones = sentence_to_tones(
       .35, # time per syllable
       .1,  # volume
-      "the quick brown fox, however, jumps over the lazy dog.",
+      "Our Father, who art in heaven, shallow be thy name; thy kingdom come; thy will be done; on earth as it is in heaven. Give us this day our daily bread. And forgive us our trek pass 's, as we forgive those who trek pass against us. And lead us not into temptation; but deliver us from evil. Amen.",
       formant_filter=to_chord,
       stop_pause=1.5,
       break_pause=0.7,
@@ -45,11 +45,13 @@ def soundify(ws):
       amplification_profile=(lambda x: math.sin(math.pi * x) ** .35) # TODO: change
     )
 
-    ws.send(serialise({ "type": "initial", "n_packets": len(tones) }))
+    ws.send(serialise({ "type": "start", "n_packets": len(tones) }))
 
     # TODO implement pauses
     for tone in tones:
       logging.debug(f"going to send {tone}")
       ws.send(serialise(tone))
+
+    ws.send(serialise({ "type": "end" }))
 
 app.run()

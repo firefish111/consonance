@@ -7,6 +7,20 @@
   <body>
     <h1>lorem ipsum dolor sit amet</h1>
     <p>lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+    <button id="play">play audio</button>
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
     <script src="{{ url_for('static', filename='js/websock.js') }}"></script>
+    <script>
+      const playBut = document.querySelector("button#play");
+
+      function set_button(enabled) {
+        playBut.disabled = !enabled;
+      }
+
+      init_ws();
+      init_audio();
+
+      playBut.addEventListener("click", read_ws); // TODO: make from textbox
+    </script>
   </body>
 </html>
