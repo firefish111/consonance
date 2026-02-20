@@ -4,10 +4,12 @@ import flask
 import flask_sock
 import math
 import json
+import logging
 
 # local import
 from sounds.chords import to_chord
 from sounds.sentence import sentence_to_tones
+from sounds.serialise import serialise
 
 # __name__ is the package name.
 # we use this so that we can hunt for templates, static files, etc
@@ -29,7 +31,7 @@ def soundify(ws):
   while True:
     # block until websocket
     data = ws.receive()
-    print(f"got: {data}")
+    logging.debug(f"got: {data}")
 
 
     tones = sentence_to_tones(
@@ -43,11 +45,11 @@ def soundify(ws):
       amplification_profile=(lambda x: math.sin(math.pi * x) ** .35) # TODO: change
     )
 
-    ws.send(json.dumps({ "n_packets": len(tones) }))
+    ws.send(serialise({ "type": "initial", "n_packets": len(tones) }))
 
     # TODO implement pauses
     for tone in tones:
-      print(f"going to send {tone}")
-      ws.send(bytes(tone))
+      logging.debug(f"going to send {tone}")
+      ws.send(serialise(tone))
 
 app.run()
