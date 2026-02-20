@@ -17,3 +17,6 @@ def serialise(data):
     return pack_to_float_array(data)
 
   return data
+
+# to convert ticket. really done to put all the serialisation methods in one place
+to_ticket = json.loads

@@ -7,7 +7,30 @@
   <body>
     <h1>lorem ipsum dolor sit amet</h1>
     <p>lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
-    <button id="play">play audio</button>
+    <div>
+      {% for key, settings in input_data.items() %}
+        <label for="{{ key }}">{{ settings.name }}</label>
+        <input type="{{ settings.type }}"
+          min="{{ settings.bounds[0] }}"
+          step="{{ settings.bounds[1] }}"
+          max="{{ settings.bounds[2] }}"
+          value="{{ defaults[key] }}"
+          name="{{ key }}"
+          id="{{ key }}"
+        />
+        {% if settings.percentage %}
+          <div name="{{key}}" class="percentage"></div>
+        {% endif %}
+        <br/>
+      {% endfor %}
+
+      <label for="sentence">Text to convert</label>
+      <textarea name="sentence" id="sentence" rows="5" cols="30"></textarea>
+      <br/>
+
+      <button id="play">Play audio</button>
+    </div>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
     <script src="{{ url_for('static', filename='js/websock.js') }}"></script>
     <script>
@@ -20,7 +43,7 @@
       init_ws();
       init_audio();
 
-      playBut.addEventListener("click", read_ws); // TODO: make from textbox
+      playBut.addEventListener("click", () => writer.write(JSON.stringify(collate_config()))); // TODO: make from textbox
     </script>
   </body>
 </html>

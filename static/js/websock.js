@@ -27,6 +27,10 @@ async function play_ticket(ticket) {
       console.log(`end: ${ticket}`);
       set_button(true);
       break;
+    case "error":
+      console.log(`end: ${ticket}`);
+      alert(`Error: ${ticket.message}`);
+      break;
     case "pause":
       console.log(`pausing for ${ticket.samples}`);
       return new Promise(r =>
@@ -60,12 +64,12 @@ async function init_ws() {
 
   reader = readable.getReader();
   writer = writable.getWriter();
+
+  read_ws();
 }
 
+// should run perpetually
 async function read_ws() {
-  // TODO: write on button press
-  writer.write("blah blah blah");
-
   for (;;) {
     const { value, done } = await reader.read();
 
