@@ -28,17 +28,18 @@ TAPER = .35
 TEXT_ID = "paternoster"
 FILE_OUT = "out.wav"
 
-print(f"Writing text '{TEXT_ID}' to {FILE_OUT}.\n\tSetting: {TIME_PER_SYLLABLE} seconds per syllable, {VOLUME * 100}% volume, and taper after {TAPER}")
+if __name__ == "__main__":
+  print(f"Writing text '{TEXT_ID}' to {FILE_OUT}.\n\tSetting: {TIME_PER_SYLLABLE} seconds per syllable, {VOLUME * 100}% volume, and taper after {TAPER}")
 
-tones = sentence_to_tones(
-  TIME_PER_SYLLABLE,
-  VOLUME,
-  texts[TEXT_ID],
-  formant_filter=to_chord,
-  stop_pause=1.5,
-  break_pause=0.7,
-  interword_pause=0.025,
-  amplification_profile=(lambda x: math.sin(math.pi * x) ** TAPER)
-)
+  tones = sentence_to_tones(
+    TIME_PER_SYLLABLE,
+    VOLUME,
+    texts[TEXT_ID],
+    formant_filter=to_chord,
+    stop_pause=1.5,
+    break_pause=0.7,
+    interword_pause=0.025,
+    amplification_profile=(lambda x: math.sin(math.pi * x) ** TAPER)
+  )
 
-synth.write(FILE_OUT, *tones)
+  synth.write(FILE_OUT, *tones)
