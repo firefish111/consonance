@@ -7,8 +7,10 @@ if (!("WebSocketStream" in self)) {
   debugger;
 }
 
-// stub
 async function play_sample(arraybuf) {
+  // if halting we do nothing: neither play, nor wait
+  if (halting) return null;
+
   // call audio code
   await play_chunk(arraybuf);
 
@@ -29,17 +31,21 @@ async function play_ticket(ticket) {
   switch (ticket.type) {
     case "start":
       console.debug(`start: ${ticket}`);
-      set_button(false);
+      set_button(true);
       break;
     case "end":
       console.debug(`end: ${ticket}`);
-      set_button(true);
+      halting = false; // depause
+      set_button(false);
       break;
     case "error":
       console.debug(`error: ${ticket}`);
       alert(`Error: ${ticket.message}`);
       break;
     case "pause":
+      // if halting we do nothing, i.e. do not pause
+      if (halting) break;
+
       console.debug(`pausing for ${ticket.samples}`);
       return new Promise(r => // see play_sample() above for why we return
         setTimeout(
@@ -53,14 +59,10 @@ async function play_ticket(ticket) {
   }
 }
 
-let wss = null;
-let reader = null;
-let writer = null;
-
 // sets up websocket
 async function init_ws() {
   // we do automatic detection of protocol (ws:// or wss://), we can't know if we have ssl or not
-  wss = new WebSocketStream(
+  const wss = new WebSocketStream(
     location.protocol.replace("http", "ws") + "//" +
     location.host +
     "/soundify" // url slug
@@ -72,29 +74,40 @@ async function init_ws() {
 
   console.log("Websocket open");
 
-  reader = readable.getReader();
-  writer = writable.getWriter();
+  const reader = readable.getReader();
+  const writer = writable.getWriter();
+
+  // reader generator: used so that reader and writer don't have to escape this scope
+  async function* read_stream() {
+    for (;;) {
+      const { value, done } = await reader.read();
+
+      if (done) return;
+      yield value;
+    }
+  }
 
   // start infinite loop.
   // NOTE: we don't start this anywhere else because all of the above MUST BE COMPLETE
   // in order for this to work
-  read_ws();
+  read_ws(read_stream);
+
+  // this is a global variable so that writer doesn't have to escape scope
+  window.send_ticket = function(ticket) {
+    writer.write(JSON.stringify(ticket));
+  }
 }
 
 // should run perpetually
-async function read_ws() {
-  for (;;) {
-    const { value, done } = await reader.read();
-
-    if (typeof value == "string") { // if is a ticket
-      console.log(value);
-      const ticket = JSON.parse(value);
+async function read_ws(generator) {
+  for await (const packet of generator()) {
+    if (typeof packet == "string") { // if is a ticket
+      console.log(packet);
+      const ticket = JSON.parse(packet);
       await play_ticket(ticket);
     } else { // if is a binary blob, i.e. list of samples
-      const floated = new Float32Array(value, 0, value.byteLength >> 2); // this is just a pointer, does not copy
+      const floated = new Float32Array(packet, 0, packet.byteLength >> 2); // this is just a pointer, does not copy
       await play_sample(floated);
     }
-
-    if (done) break;
   }
 }

@@ -28,22 +28,31 @@
       <textarea name="sentence" id="sentence" rows="5" cols="30"></textarea>
       <br/>
 
-      <button id="play">Play audio</button>
+      <button id="play">Play sound</button>
+      <button id="stop">Stop playback</button>
     </div>
     <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
     <script src="{{ url_for('static', filename='js/websock.js') }}"></script>
     <script>
+      var halting = false; // var because we want to hoist it up
       const playBut = document.querySelector("button#play");
+      const stopBut = document.querySelector("button#stop");
 
-      function set_button(enabled) {
-        playBut.disabled = !enabled;
+      function set_button(playing) {
+        playBut.disabled =  playing;
+        stopBut.disabled = !playing;
       }
 
+      // init function returns send ticket
       init_ws();
       init_audio();
 
-      playBut.addEventListener("click", () => writer.write(JSON.stringify(collate_config()))); // TODO: make from textbox
+      playBut.addEventListener("click", () => send_ticket(collate_config()));
+      // we just halt playback.
+      // no point sending a message, because chances are, everything's already been sent and is buffered
+      // so, we have no choice but to ignore what we've got until the end
+      stopBut.addEventListener("click", () => halting = true);
     </script>
   </body>
 </html>
