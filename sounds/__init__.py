@@ -17,6 +17,7 @@ texts = {
   "shakespeare": "To be, or not to be. That is the question. Whether its noble in the mind to suffer the sling and arrow of outrageous fortune, or to take arms against a sea of troubles.",
   "bible": "In the beginning God created the heaven and the earth. And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters. And God said, Let there be light: and there was light. And God saw the light, that it was good: and God divided the light from the darkness. And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day.",
   "paternoster": "Our Father, who art in heaven, shallow be thy name; thy kingdom come; thy will be done; on earth as it is in heaven. Give us this day our daily bread. And forgive us our trek pass 's, as we forgive those who trek pass against us. And lead us not into temptation; but deliver us from evil. Amen.",
+  "apostrophised": "the-text-is-true're with the2're there'd've aren't",
 }
 
 TIME_PER_SYLLABLE = .35
@@ -25,7 +26,7 @@ VOLUME = .1
 # a very very small taper ends in basically a step function 0 -> 1 -> 0
 TAPER = .35
 
-TEXT_ID = "paternoster"
+TEXT_ID = "apostrophised"
 FILE_OUT = "out.wav"
 
 print(f"Writing text '{TEXT_ID}' to {FILE_OUT}.\n\tSetting: {TIME_PER_SYLLABLE} seconds per syllable, {VOLUME * 100}% volume, and taper after {TAPER}")
