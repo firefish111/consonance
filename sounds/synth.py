@@ -38,6 +38,11 @@ def synth(secs, *tones, volume_profile=(lambda progress: 1), interpolate_with=No
     yield clamped
     #yield min(255, math.floor((clamped + 1) * 128)) # map it onto 0-255
 
+# create tapering profile
+def taper_by(taper):
+  def taper_coefficient(t):
+    return math.sin(math.pi * t) ** taper
+  return taper_coefficient
 
 # pseudo_pause: for network efficiency
 def pause(secs):

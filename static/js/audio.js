@@ -1,7 +1,7 @@
 window.SAMPLE_RATE = 8000; // 8kHz
 
+// ctx = audio context (this is set in init_audio)
 let ctx = null;
-let src = null;
 
 function init_audio() {
   ctx = new AudioContext({
@@ -17,9 +17,10 @@ function play_chunk(float_arr) {
   });
   buf.getChannelData(0).set(float_arr);
 
-  const src = ctx.createBufferSource();
+  const src = ctx.createBufferSource(); // once a source has been played, it's no use anymore (can't replay), so we just throw it away
   src.buffer = buf;
   src.connect(ctx.destination);
   src.start();
-  src.onended = () => console.log("done");
+  // we can set the onended if we want
+  // src.onended = () => {};
 }

@@ -16,8 +16,10 @@ from data import defaults, input_data, limited_keys
 # we use this so that we can hunt for templates, static files, etc
 app = flask.Flask(__name__)
 
-# TODO: heartbeat ping/pong
-# app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25}
+# websocket ping/pong.
+# pings the browser every 25s: if no response, then client has died.
+# the browser automatically does this, and client-code doesn't need to care
+app.config['SOCK_SERVER_OPTIONS'] = { 'ping_interval': 25 }
 
 sock = flask_sock.Sock(app)
 
@@ -31,16 +33,21 @@ def get_defaults():
 
 @sock.route("/soundify")
 def soundify(ws):
-  # TODO handle "word not in dictionary" exceptions
   while True:
-    # block until websocket
+    # block until websocket pakcet received
     received = ws.receive()
-    print("got", received)
-    ticket = to_ticket(received)
+    logging.debug(f"got ${received}")
+
+    # try if failed to serialise
+    try:
+      ticket = to_ticket(received)
+    except Exception as e:
+      ws.send(serialise({ "type": "error", "message": "Malformed input: " + str(e) }))
+      continue # ignore this current message, wait for next
 
     # if sentence does not exist or is empty
     if "sentence" not in ticket or not ticket["sentence"]:
-      # no payload
+      # no payloaad, so just a start and end packet in quick succession
       ws.send(serialise({ "type": "start", "n_packets": 0 }))
       ws.send(serialise({ "type": "end" }))
       continue
@@ -63,18 +70,22 @@ def soundify(ws):
         stop_pause=ticket["stop_pause"],
         break_pause=ticket["comma_pause"],
         interword_pause=ticket["interword_pause"],
-        amplification_profile=(lambda x: math.sin(math.pi * x) ** ticket["taper"]) # TODO: consonants
+        amplification_profile=synth.taper_by(ticket["taper"]) # TODO: consonants
       )
     except Exception as e:
+      # broadcast error, such as word not in dictionary
       ws.send(serialise({ "type": "error", "message": str(e) }))
       continue
 
+    # start message
     ws.send(serialise({ "type": "start", "n_packets": len(tones) }))
 
+    # broadcast each tone as a packet
     for tone in tones:
       logging.debug(f"going to send {tone}")
       ws.send(serialise(tone))
 
+    # end message
     ws.send(serialise({ "type": "end" }))
 
 app.run()
