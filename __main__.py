@@ -7,6 +7,7 @@ import json
 import logging
 
 # local import
+from sounds.synth import taper_by
 from sounds.chords import to_chord
 from sounds.sentence import sentence_to_tones
 from sounds.serialise import serialise, to_ticket
@@ -70,7 +71,7 @@ def soundify(ws):
         stop_pause=ticket["stop_pause"],
         break_pause=ticket["comma_pause"],
         interword_pause=ticket["interword_pause"],
-        amplification_profile=synth.taper_by(ticket["taper"]) # TODO: consonants
+        amplification_profile=taper_by(ticket["taper"]) # TODO: consonants
       )
     except Exception as e:
       # broadcast error, such as word not in dictionary
