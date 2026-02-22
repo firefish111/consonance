@@ -50,7 +50,5 @@ def sentence_to_tones(secs_per_syllable, volume, text, *, stop_pause=0, break_pa
 
     tones.append(synth.pause(interword_pause))
 
-  tones.append(synth.pause(secs_per_syllable))
-
   return tones
 

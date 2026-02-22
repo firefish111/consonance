@@ -19,7 +19,7 @@ def get_table(debug=False):
   if debug:
     allphones = set()
 
-  with open(cachefile, 'r') as f:
+  with open(cachefile, 'r', encoding="utf-8") as f:
     for line in f.readlines():
       s = line.split(',')
       phones = s[1].strip().split(' ')

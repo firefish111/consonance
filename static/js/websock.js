@@ -11,16 +11,22 @@ async function play_sample(arraybuf) {
   // if halting we do nothing: neither play, nor wait
   if (halting) return null;
 
-  // call audio code
-  await play_chunk(arraybuf);
+  // call audio code.
+  // this returns a promise that is resolved once the audio source ends,
+  // and since all async functions return a promise, we can replace the promise with this one.
+  // this is awaited later on
+  return play_chunk(arraybuf);
+}
 
-  // wait a while until we start to read the next one.
-  // because all async functions return a promise, we can replace the promise with one
-  // for waiting, which we will then await later on
-  return new Promise(r =>
+async function pause_for(sample_n) {
+  // if halting we do nothing: i.e. do not pause
+  if (halting) return null;
+
+  console.debug(`pausing for ${sample_n}`);
+  return new Promise(r => // see play_sample() above for why we return
     setTimeout(
       r,
-      arraybuf.length * 1000 / window.SAMPLE_RATE
+      sample_n * 1000 / window.SAMPLE_RATE
     )
   );
 }
@@ -43,16 +49,8 @@ async function play_ticket(ticket) {
       alert(`Error: ${ticket.message}`);
       break;
     case "pause":
-      // if halting we do nothing, i.e. do not pause
-      if (halting) break;
-
-      console.debug(`pausing for ${ticket.samples}`);
-      return new Promise(r => // see play_sample() above for why we return
-        setTimeout(
-          r,
-          ticket.samples * 1000 / window.SAMPLE_RATE
-        )
-      );
+      await pause_for(ticket.samples);
+      break;
     default:
       console.warn(`Unknown ticket type "${ticket.type}"`);
       break;
@@ -102,7 +100,7 @@ async function init_ws() {
 async function read_ws(generator) {
   for await (const packet of generator()) {
     if (typeof packet == "string") { // if is a ticket
-      console.log(packet);
+      console.debug("received", packet);
       const ticket = JSON.parse(packet);
       await play_ticket(ticket);
     } else { // if is a binary blob, i.e. list of samples

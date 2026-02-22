@@ -7,6 +7,7 @@ function init_audio() {
 
   // this is a global variable
   window.play_chunk = function(float_arr) {
+    console.debug("playing at t =", Date.now())
     const buf = new AudioBuffer({
       numberOfChannels: 1,
       length: float_arr.length,
@@ -18,7 +19,11 @@ function init_audio() {
     src.buffer = buf;
     src.connect(ctx.destination);
     src.start();
-    // we can set the onended if we want
-    // src.onended = () => {};
+
+    // we can await this promise to wait until audio is done.
+    // we return this promise so that we can await the whole function call
+    return new Promise(resolve => {
+      src.onended = resolve;
+    });
   }
 }
