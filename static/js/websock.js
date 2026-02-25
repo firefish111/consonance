@@ -13,7 +13,7 @@ async function play_sample(arraybuf) {
 
   // this is also async, so it does not block
 //  const interval_id = put_canvas(arraybuf);
-  canvas_buf = arraybuf;
+  set_buf(arraybuf);
 
   // call audio code.
   // this returns a promise that is resolved once the audio source ends,
@@ -47,8 +47,7 @@ async function play_ticket(ticket) {
       console.debug(`end: ${ticket}`);
       halting = false; // depause
       set_button(false);
-//      clear_canvas();
-      canvas_buf = null;
+      set_buf(null);
       break;
     case "error":
       console.debug(`error: ${ticket}`);

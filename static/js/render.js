@@ -5,13 +5,13 @@ const rend = canv.getContext("2d");
 const N_SAMPLES = 400;
 
 // oscilloscope path
-const COLOUR = "#0bc2db";
-
 async function clear_canvas() {
   rend.clearRect(0, 0, canv.width, canv.height);
 }
 
 clear_canvas();
+
+const COLOURS = ["#f04b35", "#59de37", "#0bc2db", "#ff4ccf"];
 
 // 1/2 * cos^2(pi*t) + 1/2
 const scale = t => (Math.cos(Math.PI*t)**2)*.5 + 0.5
@@ -19,6 +19,15 @@ const scale = t => (Math.cos(Math.PI*t)**2)*.5 + 0.5
 let t = 0;
 
 let canvas_buf = null;
+let colour = null;
+
+async function set_buf(buffer) {
+  canvas_buf = buffer;
+  let hue = Math.trunc(Math.random() * COLOURS.length);
+  colour = COLOURS[hue];
+  console.log(colour);
+}
+
 setInterval(() => {
   // baseline x
   const baseline = canv.height / 2;
@@ -38,7 +47,7 @@ setInterval(() => {
     const size = document.querySelector("input#time_per_syllable").value / 0.05;
 
     rend.beginPath();
-    rend.strokeStyle = COLOUR;
+    rend.strokeStyle = colour;
     for (let i = 0; i < N_SAMPLES; ++i) {
       rend.lineTo(i * (y_segment + 1), (canvas_buf[i] * scale(t/size)) * baseline + baseline);
     }
