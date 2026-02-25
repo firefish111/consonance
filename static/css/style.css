@@ -2,8 +2,9 @@
 
 body {
   font-family: "Outfit" !important;
+  font-size: 1.2em;
   background: #eee;
-  margin: 0;
+  margin: 0 1vw; /* none on top and bottom, but a little on sides */
 }
 
 h1, .desc {
@@ -17,11 +18,12 @@ main.wrapper {
     "header header header"
     "text buttons config"
     "display display display";
-  grid-template-rows: 1fr auto 5fr;
+/*  grid-template-rows: 1fr auto auto; */
   grid-template-columns: 4fr auto 4fr;
   flex-direction: column;
   margin: 0;
-  height: 100vh;
+  height: 95vh;
+  padding-bottom: 5vh;
 }
 
 main.wrapper > * {
@@ -54,6 +56,7 @@ div.buttons {
   display: flex;
   flex-direction: column;
   align-content: space-around;
+  margin: 20px;
 }
 
 div.buttons > button {
@@ -65,24 +68,36 @@ div.buttons > button {
   background: oklch(0.8 0 0);
 }
 
-div.buttons > button#play:not(:disabled) {
+/* lightness: 0.80
+   chroma:    0.08 normally, 0.15 pressed, 0 inactive
+   hue:       140deg play, 25deg stop, 0deg inactive */
+
+div.buttons > button#play:enabled {
   background: oklch(0.8 0.08 140);
 }
 
-div.buttons > button#play:active {
+div.buttons > button#play:enabled:active {
   background: oklch(0.8 0.15 140);
 }
 
-div.buttons > button#stop:not(:disabled) {
+div.buttons > button#stop:enabled {
   background: oklch(0.8 0.08 25);
 }
 
-div.buttons > button#stop:active {
+div.buttons > button#stop:enabled:active {
   background: oklch(0.8 0.15 25);
 }
 
+div.buttons > button:enabled {
+  cursor: pointer;
+}
+
+div.buttons > button:disabled {
+  cursor: not-allowed;
+}
+
 div.setting-block {
-  /* because the textbox won't plan nice with margins, we make it look nice on this side manually */
+  /* because the textbox won't play nice with margins, we make it look nice on this side manually */
   margin-left: 0 !important;
   grid-area: config;
 }
@@ -111,4 +126,13 @@ div.percentage {
 
 div.canvas {
   grid-area: display;
+  place-self: center !important;
+}
+
+canvas {
+  background: black;
+  border-radius: 10px;
+  width: 60vw;
+  height: 20vw;
+  margin: auto;
 }

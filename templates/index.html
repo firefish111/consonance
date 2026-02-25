@@ -48,11 +48,12 @@
       {% endfor %}
       </div>
 
-      <div class="convas">
+      <div class="canvas">
         <!-- TODO -->
         <canvas></canvas>
       </div>
     </main>
+    <script src="{{ url_for('static', filename='js/render.js') }}"></script>
     <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
     <script src="{{ url_for('static', filename='js/websock.js') }}"></script>
