@@ -10,7 +10,8 @@ class Word:
   def __init__(self, word):
     cleanword = word.upper().strip()
 
-    self.raw = cleanword
+    # purge non-alphanumeric chars,
+    self.raw = "".join(c for c in cleanword if c.isalnum() or c in ['\'', '-'])
     # bits of word, used for splitting it up on word-internal punctuation
     bits = self.raw.replace("'", " '").replace("-", " ").strip().split()
 

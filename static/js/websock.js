@@ -54,6 +54,7 @@ async function play_ticket(ticket) {
       alert(`Error: ${ticket.message}`);
       break;
     case "pause":
+      cycle_hue();
       await pause_for(ticket.samples);
       break;
     default:

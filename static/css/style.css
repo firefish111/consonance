@@ -1,38 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
 body {
-  font-family: "Outfit" !important;
+  font-family: "Lexend Deca" !important;
   font-size: 1.2em;
   background: #eee;
   margin: 0 1vw; /* none on top and bottom, but a little on sides */
 }
 
-h1, .desc {
-  align-self: center;
+h1 {
   text-align: center;
 }
 
 main.wrapper {
   display: grid;
   grid-template-areas:
-    "header header header"
+/*    "header . ." */
     "text buttons config"
     "display display display";
 /*  grid-template-rows: 1fr auto auto; */
   grid-template-columns: 4fr auto 4fr;
   flex-direction: column;
   margin: 0;
-  height: 95vh;
-  padding-bottom: 5vh;
+  height: 85vh;
+/*  padding-bottom: 5vh; */
 }
 
 main.wrapper > * {
-  place-self: center-stretch;
   margin: 10px;
-}
-
-h1 {
-  grid-area: header;
 }
 
 div.textbox {
@@ -45,10 +39,11 @@ div.textbox textarea {
   resize: none;
 
   padding: 5px;
+  font-size: 1.2em;
 }
 
 textarea, input {
-  font-family: "Outfit" !important;
+  font-family: "Lexend Deca" !important;
 }
 
 div.buttons {
@@ -135,4 +130,42 @@ canvas {
   width: 60vw;
   height: 20vw;
   margin: auto;
+}
+
+div.info-but {
+  position: absolute;
+  right: 2vw;
+  bottom: 2vh;
+  z-index: 99999;
+
+  user-select: none;
+
+  cursor: help;
+}
+
+div.info-but > span {
+  font-size: 2em !important;
+}
+
+div.info-box {
+  position: absolute;
+  right: calc(2vw + 2.2em);
+  bottom: 5vh;
+
+  user-select: none;
+  pointer-events: none;
+
+  grid-area: info;
+  opacity: 0%;
+  transition: opacity 200ms;
+  background: #cedaed;
+  border-radius: 20px;
+  border-bottom-right-radius: 0 !important;
+  border: 5px solid #759ae5;
+  padding: 10px;
+  width: 50vw;
+}
+
+div.info-but:hover + div.info-box {
+  opacity: 100%;
 }

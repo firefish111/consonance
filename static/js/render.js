@@ -19,13 +19,16 @@ const scale = t => (Math.cos(Math.PI*t)**2)*.5 + 0.5
 let t = 0;
 
 let canvas_buf = null;
-let colour = null;
+let colour_n = 0;
 
 async function set_buf(buffer) {
   canvas_buf = buffer;
   let hue = Math.trunc(Math.random() * COLOURS.length);
-  colour = COLOURS[hue];
-  console.log(colour);
+}
+
+async function cycle_hue() {
+  colour_n++;
+  colour_n %= COLOURS.length;
 }
 
 setInterval(() => {
@@ -47,7 +50,7 @@ setInterval(() => {
     const size = document.querySelector("input#time_per_syllable").value / 0.05;
 
     rend.beginPath();
-    rend.strokeStyle = colour;
+    rend.strokeStyle = COLOURS[colour_n];
     for (let i = 0; i < N_SAMPLES; ++i) {
       rend.lineTo(i * (y_segment + 1), (canvas_buf[i] * scale(t/size)) * baseline + baseline);
     }
