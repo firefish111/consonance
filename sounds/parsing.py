@@ -6,10 +6,11 @@ cachefile = Path("./.dlcache/britfone.csv")
 if not cachefile.exists():
   r = requests.get(
     "https://raw.githubusercontent.com/JoseLlarena/Britfone/refs/heads/master/britfone.main.3.0.1.csv",
+    verify=False
   )
 
   cachefile.parent.mkdir(exist_ok=True, parents=True)
-  with cachefile.open('w') as f:
+  with cachefile.open('w', encoding="utf-8") as f:
     f.write(r.text)
 
 # debug = True calculates all phones as a set, and prints everything
