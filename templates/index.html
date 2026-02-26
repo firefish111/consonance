@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <!-- to stop chrome from sending a favicon request automatically -->
+    <link rel="icon" href="data:;base64,="/>
+
+    <!-- material ui icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></script>
+    <title>Consonance and Vowels</title>
+  </head>
+  <body>
+    <main class="wrapper">
+      <h1>Consonance and Vowels</h1>
+      <div class="textbox">
+        <textarea name="sentence" id="sentence" placeholder="Text to convert..." ></textarea>
+      </div>
+
+      <div class="buttons">
+        <button id="play">
+          <span class="material-symbols-outlined">play_arrow</span>
+        </button>
+        <button id="stop">
+          <span class="material-symbols-outlined">stop</span>
+        </button>
+      </div>
+
+      <div class="setting-block">
+      {% for key, settings in input_data.items() %}
+        <div class="setting">
+          <label for="{{ key }}">{{ settings.name }}</label>
+          {% if settings.percentage %}
+            <div name="{{key}}" class="percentage"></div>
+          {% endif %}
+          <input type="{{ settings.type }}"
+            min="{{ settings.bounds[0] }}"
+            step="{{ settings.bounds[1] }}"
+            {% if settings.bounds[2] %}
+              max="{{ settings.bounds[2] }}"
+            {% endif %}
+            value="{{ defaults[key] }}"
+            name="{{ key }}"
+            id="{{ key }}"
+          />
+        </div>
+      {% endfor %}
+      </div>
+
+      <div class="canvas">
+        <!-- TODO -->
+        <canvas></canvas>
+      </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/render.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/websock.js') }}"></script>
+    <script>
+      var halting = false; // var because we want to hoist it up
+      const playBut = document.querySelector("button#play");
+      const stopBut = document.querySelector("button#stop");
+
+      function set_button(playing) {
+        playBut.disabled =  playing;
+        stopBut.disabled = !playing;
+      }
+
+      // set buttons to be in right state at start
+      set_button(false);
+
+      // init function returns send ticket
+      init_ws();
+      init_audio();
+
+      playBut.addEventListener("click", () => send_ticket(collate_config()));
+      // we just halt playback.
+      // no point sending a message, because chances are, everything's already been sent and is buffered
+      // so, we have no choice but to ignore what we've got until the end
+      stopBut.addEventListener("click", () => halting = true);
+    </script>
+  </body>
+</html>

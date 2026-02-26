@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+body {
+  font-family: "Outfit" !important;
+  font-size: 1.2em;
+  background: #eee;
+  margin: 0 1vw; /* none on top and bottom, but a little on sides */
+}
+
+h1, .desc {
+  align-self: center;
+  text-align: center;
+}
+
+main.wrapper {
+  display: grid;
+  grid-template-areas:
+    "header header header"
+    "text buttons config"
+    "display display display";
+/*  grid-template-rows: 1fr auto auto; */
+  grid-template-columns: 4fr auto 4fr;
+  flex-direction: column;
+  margin: 0;
+  height: 95vh;
+  padding-bottom: 5vh;
+}
+
+main.wrapper > * {
+  place-self: center-stretch;
+  margin: 10px;
+}
+
+h1 {
+  grid-area: header;
+}
+
+div.textbox {
+  grid-area: text;
+}
+
+div.textbox textarea {
+  width: 100%;
+  height: 100%;
+  resize: none;
+
+  padding: 5px;
+}
+
+textarea, input {
+  font-family: "Outfit" !important;
+}
+
+div.buttons {
+  grid-area: buttons;
+  display: flex;
+  flex-direction: column;
+  align-content: space-around;
+  margin: 20px;
+}
+
+div.buttons > button {
+  margin: auto;
+  border-radius: 100%;
+  height: 3em;
+  width: 3em;
+  padding: 0 !important;
+  background: oklch(0.8 0 0);
+}
+
+/* lightness: 0.80
+   chroma:    0.08 normally, 0.15 pressed, 0 inactive
+   hue:       140deg play, 25deg stop, 0deg inactive */
+
+div.buttons > button#play:enabled {
+  background: oklch(0.8 0.08 140);
+}
+
+div.buttons > button#play:enabled:active {
+  background: oklch(0.8 0.15 140);
+}
+
+div.buttons > button#stop:enabled {
+  background: oklch(0.8 0.08 25);
+}
+
+div.buttons > button#stop:enabled:active {
+  background: oklch(0.8 0.15 25);
+}
+
+div.buttons > button:enabled {
+  cursor: pointer;
+}
+
+div.buttons > button:disabled {
+  cursor: not-allowed;
+}
+
+div.setting-block {
+  /* because the textbox won't play nice with margins, we make it look nice on this side manually */
+  margin-left: 0 !important;
+  grid-area: config;
+}
+
+div.setting-block > div.setting {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+div.setting-block > div.setting:has(input[type=range]) {
+  padding-bottom: 5px;
+}
+
+div.setting-block > div.setting > input[type=number] {
+  width: 30%;
+}
+
+div.percentage {
+  text-align: right;
+  flex-grow: 4;
+  padding-right: 10px;
+}
+
+div.canvas {
+  grid-area: display;
+  place-self: center !important;
+}
+
+canvas {
+  background: black;
+  border-radius: 10px;
+  width: 60vw;
+  height: 20vw;
+  margin: auto;
+}

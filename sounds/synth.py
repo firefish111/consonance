@@ -39,13 +39,30 @@ def synth(secs, *tones, volume_profile=(lambda progress: 1), interpolate_with=No
       wave = sum(math.sin(theta * freq + noise) for freq in tones) * volume_profile(progress)
     clamped = max(-1, min(wave, 1))
 
-    yield min(255, math.floor((clamped + 1) * 128)) # map it onto 0-255
+    yield clamped
+    #yield min(255, math.floor((clamped + 1) * 128)) # map it onto 0-255
+
+# create tapering profile
+def taper_by(taper):
+  def taper_coefficient(t):
+    return math.sin(math.pi * t) ** taper
+  return taper_coefficient
+
+# pseudo_pause: for network efficiency
+def pause(secs):
+  return {
+    "type": "pause",
+    "samples": round(secs * SAMPLE_RATE)
+  }
 
 # pause: i.e. all samples are set to 0
-def pause(secs):
-  for sample in range(round(secs * SAMPLE_RATE)): # tick for that many samples
-    yield 128 # zero
+def rawify_pause(pause_ticket):
+  assert pause_ticket["type"] == "pause"
+  for sample in range(pause_ticket["samples"]): # tick for that many samples
+    yield 0.0
+    #yield 128 # zero
 
+"""
 # takes list of generators
 def write(name, *streams):
   logging.debug(f"writing {len(streams)} streams")
@@ -54,3 +71,4 @@ def write(name, *streams):
     wv.setsampwidth(1)
     wv.setframerate(SAMPLE_RATE)
     wv.writeframes(bytes(itertools.chain.from_iterable(streams)))
+"""
