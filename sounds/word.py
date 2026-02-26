@@ -11,13 +11,25 @@ class Word:
     cleanword = word.upper().strip()
 
     self.raw = cleanword
+    # bits of word, used for splitting it up on word-internal punctuation
+    bits = self.raw.replace("'", " '").replace("-", " ").strip().split()
+
     try:
       if self.raw[-1].isdigit(): # last letter is a number
         self.phones = table[self.raw[0:-1]][int(self.raw[-1]) - 1]
+      elif self.raw not in table and all(bit.strip("1234567890") in table for bit in bits):
+        # if the word itself does not exist, but each of the pieces do
+        # recursively get words (will only be one layer deep)
+        words = [Word(subword) for subword in bits]
+        self.raw = ' '.join([w.raw for w in words])
+        self.phones = [ph for w in words for ph in w.phones]
       else:
         self.phones = table[self.raw][0]
     except KeyError:
-      raise KeyError(f"Word \"{cleanword}\" not in dictionary")
+      if len(bits) > 1:
+        raise KeyError(f"Word \"{cleanword}\" (or some part thereof) not in dictionary")
+      else:
+        raise KeyError(f"Word \"{cleanword}\" not in dictionary")
     except IndexError:
       raise IndexError(f"Word \"{cleanword[0:-1]}\" does not have pronunciation {cleanword[-1]}")
 

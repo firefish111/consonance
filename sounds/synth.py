@@ -27,12 +27,16 @@ def synth(secs, *tones, volume_profile=(lambda progress: 1), interpolate_with=No
     t = sample / SAMPLE_RATE
     theta = t * 2 * math.pi
 
-    # progress of the way through
+    # progress of the way through the sound, out of 1
     progress = t / secs
+
+    # to make pitches less uniform and more natural
+    noise = math.sin(theta * 2 + progress)
+
     if interpolate_with is not None:
-      wave = sum(math.sin(normalise(freqs, t, secs)) for freqs in data) * volume_profile(progress)
+      wave = sum(math.sin(normalise(freqs, t, secs) + noise) for freqs in data) * volume_profile(progress)
     else:
-      wave = sum(math.sin(theta * freq) for freq in tones) * volume_profile(progress)
+      wave = sum(math.sin(theta * freq + noise) for freq in tones) * volume_profile(progress)
     clamped = max(-1, min(wave, 1))
 
     yield clamped
