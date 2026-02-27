@@ -26,13 +26,18 @@ class Word:
         self.phones = [ph for w in words for ph in w.phones]
       else:
         self.phones = table[self.raw][0]
-    except KeyError:
-      if len(bits) > 1:
+    except KeyError as e:
+      if str(e).startswith("Word"): # passthrough
+        raise e
+      elif len(bits) > 1:
         raise KeyError(f"Word \"{cleanword}\" (or some part thereof) not in dictionary")
       else:
         raise KeyError(f"Word \"{cleanword}\" not in dictionary")
-    except IndexError:
-      raise IndexError(f"Word \"{cleanword[0:-1]}\" does not have pronunciation {cleanword[-1]}")
+    except IndexError as e:
+      if str(e).startswith("Word"): # passthrough
+        raise e
+      else:
+        raise IndexError(f"Word \"{cleanword[0:-1]}\" does not have pronunciation {cleanword[-1]}")
 
   # without stresses
   def pure_phones(self):
