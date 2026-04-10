@@ -17,11 +17,6 @@ from data import defaults, input_data, limited_keys
 # we use this so that we can hunt for templates, static files, etc
 app = flask.Flask(__name__)
 
-# websocket ping/pong.
-# pings the browser every 25s: if no response, then client has died.
-# the browser automatically does this, and client-code doesn't need to care
-app.config['SOCK_SERVER_OPTIONS'] = { 'ping_interval': 25 }
-
 sock = flask_sock.Sock(app)
 
 @app.route("/", methods=["GET"])
